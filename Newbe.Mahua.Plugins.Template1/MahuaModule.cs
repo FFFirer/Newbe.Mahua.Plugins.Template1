@@ -1,4 +1,6 @@
 ﻿using Autofac;
+using Newbe.Mahua.MahuaEvents;
+using Newbe.Mahua.Plugins.Template1.MahuaEvents;
 
 namespace Newbe.Mahua.Plugins.Template1
 {
@@ -45,6 +47,16 @@ namespace Newbe.Mahua.Plugins.Template1
             {
                 base.Load(builder);
                 // 将需要监听的事件注册，若缺少此注册，则不会调用相关的实现类
+                builder.RegisterType<PrivateMessageFromFriendReceivedMahuaEvent1>()
+                    .As<IPrivateMessageFromFriendReceivedMahuaEvent>();
+                builder.RegisterType<MahuaMenuClickedMahuaEventClickMenu>()
+                    .As<IMahuaMenuClickedMahuaEvent>();
+                builder.RegisterType<FriendAddingRequestMahuaEvent1>()
+                    .As<IFriendAddingRequestMahuaEvent>();
+                builder.RegisterType<FriendAddedMahuaEvent1>()
+                    .As<IFriendAddedMahuaEvent>();
+                builder.RegisterType<PrivateMessageFromGroupReceivedMahuaEvent1>()
+                    .As<IPrivateMessageFromGroupReceivedMahuaEvent>();
             }
         }
     }

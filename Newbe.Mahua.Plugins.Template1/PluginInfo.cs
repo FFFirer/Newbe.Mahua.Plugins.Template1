@@ -14,12 +14,12 @@
         /// 插件名称
         /// </summary>
 
-        public string Name { get; set; } = "插件名称";
+        public string Name { get; set; } = "淘客信息获取";
 
         /// <summary>
         /// 作者名称
         /// </summary>
-        public string Author { get; set; } = "Newbe";
+        public string Author { get; set; } = "FFFirer";
 
         /// <summary>
         /// 插件Id，用于唯一标识插件产品的Id，至少包含 AAA.BBB.CCC 三个部分
@@ -29,6 +29,6 @@
         /// <summary>
         /// 插件描述
         /// </summary>
-        public string Description { get; set; } = "插件描述";
+        public string Description { get; set; } = "发送物品名称返回信息";
     }
 }
