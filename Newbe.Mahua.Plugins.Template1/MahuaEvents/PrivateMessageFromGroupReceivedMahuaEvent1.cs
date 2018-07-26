@@ -41,9 +41,8 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
                     }
                     else if(Regex.IsMatch(ReturnMessage, @"file=.*?]"))
                     {
-                        //ReturnMessage = TransferImage(ReturnMessage);
-                        //api.SendPrivateMessage(context.FromQq, ReturnMessage);
-                        api.SendPrivateMessage(context.FromQq, "【小学数学公式定律手册 彩色版 教材全解应用题思路点拨一二三四五六年级上下册思维训练教辅知识大全 1-3-6小学数学公式单位换算书】\n[CQ:image,file=D:\\CQP-xiaoi\\酷Q Pro\\data\\image\\TB2HiWDXzfguuRjSszcXXbb7FXa_!!2982001514-0-item_pic.jpg]\n现价：12.90\n券后价：7.9\n【下单链接】\nhttps://uland.taobao.com/coupon/edetail?e=f7SVlr4inEwGQASttHIRqaDrIGMQgR%2FaIWya0l4DLrTyi1aSyqbpmoc4cdtwQZqclyl4SqF4eKkeg%2BiFujJjkC3kw205C36xDfqEFBOhTcxR0dc5vyZ8pFzX6p6qRdAPIJsfjzznD0qwkuPSKAb8M%2B1LRo38GBz3ugJmHzuXNrct%2FzOJQMDvl0gfTscre%2FnACJMVxbzoieAJlVWeIP9CzA%3D%3D&traceId=0bb6493215326093881857422e\n——————————\n复制这条信息，￥0Ku2b0Bsgeo￥,打开【手机淘宝】即可查看\n更多优惠请点击http://52lequan.cn/index.php?r=l&kw=%e6%95%99%e8%be%85");
+                        ReturnMessage = TransferImage(ReturnMessage);
+                        api.SendPrivateMessage(context.FromQq, ReturnMessage);
                     }
                     else
                     {
@@ -66,7 +65,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             string save_path = Environment.CurrentDirectory + @"\data\image\\";
             //图片下载
             DownloadImage(url, save_path + img_name);
-            string output = input.Replace(url, @"D:\CQP-xiaoi\酷Q Pro\data\image\" + img_name);
+            string output = input.Replace(url, img_name);
             return output;
         }
         /// <summary>

@@ -67,7 +67,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             string save_path = Environment.CurrentDirectory + @"\data\image\";
             //图片下载
             DownloadImage(url, save_path + img_name);
-            string output = input.Replace(url, save_path + img_name);
+            string output = input.Replace(url, img_name);
             return output;
         }
         /// <summary>
