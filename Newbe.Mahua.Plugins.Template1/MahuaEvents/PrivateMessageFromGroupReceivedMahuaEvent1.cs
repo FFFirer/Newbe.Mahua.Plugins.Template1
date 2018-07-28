@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Newbe.Mahua.Plugins.Template1.RobotRemoteService;
 using System.Net;
+using Newbe.Mahua.Plugins.Template1.Services;
 
 namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
 {
@@ -27,27 +28,22 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             //异步发送消息
             Task.Factory.StartNew(() =>
             {
-                RobotRemoteService.RobotRemoteService RrService = new RobotRemoteService.RobotRemoteService();
                 using (var robotSession = MahuaRobotManager.Instance.CreateSession())
                 {
                     string ReturnMessage = string.Empty;
                     var api = robotSession.MahuaApi;
                     string Message = context.Message;
-                    ReturnMessage = RrService.GetQuan(Message);
-                    if(Regex.IsMatch(ReturnMessage, @"^error"))
+                    string keyword = GetKeyWord(Message);
+                    string resultUrl = @"http://52lequan.cn/index.php?r=l&kw=" + System.Web.HttpUtility.UrlEncode(keyword, System.Text.Encoding.UTF8);
+                    if(keyword != "NoKey")
                     {
-                        api.SendPrivateMessage("609936294", ReturnMessage + "\n" + "原始消息：" + Message);
-                        api.SendPrivateMessage(context.FromQq, "出了一点小故障，请再试一次");
-                    }
-                    else if(Regex.IsMatch(ReturnMessage, @"file=.*?]"))
-                    {
-                        ReturnMessage = TransferImage(ReturnMessage);
-                        api.SendPrivateMessage(context.FromQq, ReturnMessage);
+                        ReturnMessage = string.Format("关键词：{0}\n链接：{1}\n复制链接在浏览器中打开\n如果没有你想要的结果，点击右侧搜索全网", keyword, resultUrl);
                     }
                     else
                     {
-                        api.SendPrivateMessage(context.FromQq, ReturnMessage);
+                        ReturnMessage = "没有识别出您想要的商品，请再输入\n我想要+商品名称\n进行搜索，如需人工服务，请联系所在群管理员";
                     }
+                    api.SendPrivateMessage(context.FromQq, ReturnMessage);
                 }
             });
         }
@@ -78,6 +74,25 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             using(WebClient client = new WebClient())
             {
                 client.DownloadFile(download_url, image_name);
+            }
+        }
+        /// <summary>
+        /// 提取关键词
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static string GetKeyWord(string RawString)
+        {
+            string KeyPattern = @"([我有].*?[有要买])([\w]+)[\W]?";
+            if (Regex.IsMatch(RawString, KeyPattern))
+            {
+                Match match = Regex.Match(RawString, KeyPattern);
+                string keyword = match.Groups[2].Value;
+                return keyword;
+            }
+            else
+            {
+                return "NoKey";
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Newbe.Mahua.MahuaEvents;
 using Newbe.Mahua.Plugins.Template1.MahuaEvents;
+using Newbe.Mahua.Plugins.Template1.Services;
+using Newbe.Mahua.Plugins.Template1.Services.Impl;
 
 namespace Newbe.Mahua.Plugins.Template1
 {
@@ -16,6 +18,7 @@ namespace Newbe.Mahua.Plugins.Template1
             {
                 new PluginModule(),
                 new MahuaEventsModule(),
+                new MyServiceMoudle(),
             };
         }
 
@@ -57,6 +60,29 @@ namespace Newbe.Mahua.Plugins.Template1
                     .As<IFriendAddedMahuaEvent>();
                 builder.RegisterType<PrivateMessageFromGroupReceivedMahuaEvent1>()
                     .As<IPrivateMessageFromGroupReceivedMahuaEvent>();
+                builder.RegisterType<InitializationMahuaEvent1>()
+                    .As<IInitializationMahuaEvent>();
+            }
+        }
+
+        /// <summary>
+        /// 服务处理模块
+        /// </summary>
+        private class MyServiceMoudle : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                base.Load(builder);
+                //确保服务时单例
+                builder.RegisterType<OwinWebHost>()
+                    .As<IWebHost>()
+                    .SingleInstance();
+
+                //AsSelf是为了Hangfire能够初始化这个类
+                builder.RegisterType<PublishQuan>()
+                    .As<IPublishQuan>().
+                    AsSelf();
+
             }
         }
     }

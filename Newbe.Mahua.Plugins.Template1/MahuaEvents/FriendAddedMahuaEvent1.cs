@@ -26,7 +26,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
                 using (var robotSession = MahuaRobotManager.Instance.CreateSession())
                 {
                     var api = robotSession.MahuaApi;
-                    api.SendPrivateMessage(context.FromQq, "欢迎使用小盒子人工助理服务！");
+                    api.SendPrivateMessage(context.FromQq, "欢迎使用小盒子人工助理服务！输入\n 我想要+关键词 \n搜索优惠券\n或在浏览器打开以下链接寻找更多你喜欢的额内容");
                 }
             });
 
