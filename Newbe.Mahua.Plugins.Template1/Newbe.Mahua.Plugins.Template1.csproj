@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="MahuaEvents\FriendAddedMahuaEvent1.cs" />
     <Compile Include="MahuaEvents\FriendAddingRequestMahuaEvent1.cs" />
+    <Compile Include="MahuaEvents\GroupMemberIncreasedMahuaEvent1.cs" />
     <Compile Include="MahuaEvents\InitializationMahuaEvent1.cs" />
     <Compile Include="MahuaEvents\MahuaMenuClickedMahuaEventClickMenu.cs" />
     <Compile Include="MahuaEvents\PrivateMessageFromFriendReceivedMahuaEvent1.cs" />
