@@ -84,6 +84,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
             }
 
         }
+
         /// <summary>
         /// 将网络图片下载，并保存在本地路径，将网络地址替换为本地相对路径
         /// </summary>
@@ -100,6 +101,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
             string output = input.Replace(url, img_name);
             return output;
         }
+
         /// <summary>
         /// 从网络下载图片
         /// </summary>
