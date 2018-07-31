@@ -48,34 +48,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             });
         }
 
-        /// <summary>
-        /// 将网络图片下载，并保存在本地路径，将网络地址替换为本地相对路径
-        /// </summary>
-        /// <param name="input"></param>
-        public static string TransferImage(string input)
-        {
-            string imgPattern = @"file=(.*?)]";
-            Match M_Img = Regex.Match(input, imgPattern);
-            string url = M_Img.Groups[1].Value;
-            string img_name = System.IO.Path.GetFileName(url);
-            string save_path = Environment.CurrentDirectory + @"\data\image\\";
-            //图片下载
-            DownloadImage(url, save_path + img_name);
-            string output = input.Replace(url, img_name);
-            return output;
-        }
-        /// <summary>
-        /// 从网络下载图片
-        /// </summary>
-        /// <param name="weburl"></param>
-        public static void DownloadImage(string weburl, string image_name)
-        {
-            Uri download_url = new Uri(weburl);
-            using(WebClient client = new WebClient())
-            {
-                client.DownloadFile(download_url, image_name);
-            }
-        }
+        
         /// <summary>
         /// 提取关键词
         /// </summary>

@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using System.Diagnostics;
+using CronExpressionDescriptor;
+using Newbe.Mahua.Plugins.Template1.RobotRemoteService;
+using System.Text.RegularExpressions;
+using System.Net;
 
 namespace Newbe.Mahua.Plugins.Template1.Services.Impl
 {
@@ -12,19 +16,21 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
     {
         //每天零点触发
         private static readonly string JobId = "jobid";
-
+        private static readonly List<string> TimeList = new List<string> { "7", "9", "12", "18", "20" };
         private readonly IMahuaApi _mahuaApi;
+        private readonly IFaQuanStorege _faquanstorege;
 
-        public PublishQuan(IMahuaApi mahuaApi)
+        public PublishQuan(IMahuaApi mahuaApi, IFaQuanStorege faQuanStorege)
         {
             _mahuaApi = mahuaApi;
+            _faquanstorege = faQuanStorege;
         }
 
         public Task StartAsync()
         {
             //添加定时任务
             //每隔一段时间触发
-            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.MinuteInterval(5));
+            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.Hourly());
 
             //使用浏览器打开定时任务的网址
             Process.Start("http://localHost:65238/hangfire/recurring");
@@ -47,9 +53,64 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         }
         public void Tasks2Do()
         {
-            SendMeesage("定时任务：间隔五分钟触发");
-            BackgroundJob.Schedule(() => SendMeesage("延迟任务：延迟一分钟触发"), TimeSpan.FromMinutes(1));
-            BackgroundJob.Schedule(() => SendMeesage("延迟任务：延迟两分钟触发"), TimeSpan.FromMinutes(2));
+            RobotRemoteService.RobotRemoteService service = new RobotRemoteService.RobotRemoteService();
+            //获取当前的时间
+            string Hour = DateTime.Now.Hour.ToString();
+            //检查是否要开始发券
+            if (TimeList.Contains(Hour))
+            {
+                //获取每个群的券关键词
+                List<FaQuanInfo> all_info = _faquanstorege.GetAllFaQuanInfoAsync().GetAwaiter().GetResult();
+                List<string> quns = all_info.Select(x => x.QunID).Distinct().ToList();
+                foreach(string id in quns)
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        List<string> result = new List<string>();
+                        List<string> keys = all_info.Where(p => p.QunID.Equals(id)).Select(x => x.Info).ToList();
+                        foreach (string key in keys)
+                        {
+                            List<string> res = service.PostQuans(key, 1).ToList();
+                            result.AddRange(res);
+                        }
+                        List<string> r = result.OrderBy(p => p.Length).Take(15).ToList();
+                        foreach (var l in r)
+                        {
+                            string o = TransferImage(l);
+                            _mahuaApi.SendGroupMessage(id, o);
+                        }
+                    });
+                }
+            }
+
+        }
+        /// <summary>
+        /// 将网络图片下载，并保存在本地路径，将网络地址替换为本地相对路径
+        /// </summary>
+        /// <param name="input"></param>
+        public static string TransferImage(string input)
+        {
+            string imgPattern = @"file=(.*?)]";
+            Match M_Img = Regex.Match(input, imgPattern);
+            string url = M_Img.Groups[1].Value;
+            string img_name = System.IO.Path.GetFileName(url);
+            string save_path = Environment.CurrentDirectory + @"\data\image\\";
+            //图片下载
+            DownloadImage(url, save_path + img_name);
+            string output = input.Replace(url, img_name);
+            return output;
+        }
+        /// <summary>
+        /// 从网络下载图片
+        /// </summary>
+        /// <param name="weburl"></param>
+        public static void DownloadImage(string weburl, string image_name)
+        {
+            Uri download_url = new Uri(weburl);
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFile(download_url, image_name);
+            }
         }
     }
 }

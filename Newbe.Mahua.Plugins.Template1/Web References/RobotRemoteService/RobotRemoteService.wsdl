@@ -26,6 +26,26 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="PostQuans">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Q" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="page_no" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PostQuansResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PostQuansResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="HelloWorldSoapIn">
@@ -40,6 +60,12 @@
   <wsdl:message name="GetQuanSoapOut">
     <wsdl:part name="parameters" element="tns:GetQuanResponse" />
   </wsdl:message>
+  <wsdl:message name="PostQuansSoapIn">
+    <wsdl:part name="parameters" element="tns:PostQuans" />
+  </wsdl:message>
+  <wsdl:message name="PostQuansSoapOut">
+    <wsdl:part name="parameters" element="tns:PostQuansResponse" />
+  </wsdl:message>
   <wsdl:portType name="RobotRemoteServiceSoap">
     <wsdl:operation name="HelloWorld">
       <wsdl:input message="tns:HelloWorldSoapIn" />
@@ -48,6 +74,10 @@
     <wsdl:operation name="GetQuan">
       <wsdl:input message="tns:GetQuanSoapIn" />
       <wsdl:output message="tns:GetQuanSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PostQuans">
+      <wsdl:input message="tns:PostQuansSoapIn" />
+      <wsdl:output message="tns:PostQuansSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="RobotRemoteServiceSoap" type="tns:RobotRemoteServiceSoap">
@@ -70,6 +100,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="PostQuans">
+      <soap:operation soapAction="http://tempuri.org/PostQuans" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="RobotRemoteServiceSoap12" type="tns:RobotRemoteServiceSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -84,6 +123,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetQuan">
       <soap12:operation soapAction="http://tempuri.org/GetQuan" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostQuans">
+      <soap12:operation soapAction="http://tempuri.org/PostQuans" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

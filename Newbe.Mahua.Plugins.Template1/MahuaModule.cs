@@ -62,6 +62,8 @@ namespace Newbe.Mahua.Plugins.Template1
                     .As<IPrivateMessageFromGroupReceivedMahuaEvent>();
                 builder.RegisterType<InitializationMahuaEvent1>()
                     .As<IInitializationMahuaEvent>();
+                builder.RegisterType<GroupMemberIncreasedMahuaEvent1>()
+                    .As<IGroupMemberIncreasedMahuaEvent>();
             }
         }
 
@@ -83,6 +85,14 @@ namespace Newbe.Mahua.Plugins.Template1
                     .As<IPublishQuan>().
                     AsSelf();
 
+                builder.RegisterType<AdminControl>()
+                    .As<IAdminControl>();
+
+                builder.RegisterType<FaQuanStorege>()
+                    .As<IFaQuanStorege>();
+
+                builder.RegisterType<SqliteDbHelper>()
+                    .As<IDbHelper>();
             }
         }
     }

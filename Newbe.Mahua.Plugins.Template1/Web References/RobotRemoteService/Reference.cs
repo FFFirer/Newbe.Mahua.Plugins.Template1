@@ -33,6 +33,8 @@ namespace Newbe.Mahua.Plugins.Template1.RobotRemoteService {
         
         private System.Threading.SendOrPostCallback GetQuanOperationCompleted;
         
+        private System.Threading.SendOrPostCallback PostQuansOperationCompleted;
+        
         private bool useDefaultCredentialsSetExplicitly;
         
         /// <remarks/>
@@ -76,6 +78,9 @@ namespace Newbe.Mahua.Plugins.Template1.RobotRemoteService {
         
         /// <remarks/>
         public event GetQuanCompletedEventHandler GetQuanCompleted;
+        
+        /// <remarks/>
+        public event PostQuansCompletedEventHandler PostQuansCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/HelloWorld", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -130,6 +135,37 @@ namespace Newbe.Mahua.Plugins.Template1.RobotRemoteService {
             if ((this.GetQuanCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.GetQuanCompleted(this, new GetQuanCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/PostQuans", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string[] PostQuans(string Q, long page_no) {
+            object[] results = this.Invoke("PostQuans", new object[] {
+                        Q,
+                        page_no});
+            return ((string[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void PostQuansAsync(string Q, long page_no) {
+            this.PostQuansAsync(Q, page_no, null);
+        }
+        
+        /// <remarks/>
+        public void PostQuansAsync(string Q, long page_no, object userState) {
+            if ((this.PostQuansOperationCompleted == null)) {
+                this.PostQuansOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPostQuansOperationCompleted);
+            }
+            this.InvokeAsync("PostQuans", new object[] {
+                        Q,
+                        page_no}, this.PostQuansOperationCompleted, userState);
+        }
+        
+        private void OnPostQuansOperationCompleted(object arg) {
+            if ((this.PostQuansCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PostQuansCompleted(this, new PostQuansCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -200,6 +236,32 @@ namespace Newbe.Mahua.Plugins.Template1.RobotRemoteService {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    public delegate void PostQuansCompletedEventHandler(object sender, PostQuansCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3056.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class PostQuansCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal PostQuansCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string[])(this.results[0]));
             }
         }
     }

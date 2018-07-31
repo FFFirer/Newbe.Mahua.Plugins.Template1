@@ -26,9 +26,6 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             _mahuaApi = mahuaApi;
             //_publishquan = publishQuan;
             _admincontrol = adminControl;
-            AdminList.Add("609936294");
-            AdminList.Add("2432880190");
-            AdminList.Add("2653254193");
         }
 
         public void ProcessFriendMessage(PrivateMessageFromFriendReceivedContext context)
@@ -36,27 +33,9 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             //判断发送的QQ是否来自管理员
             if(_admincontrol.IsAdmin(context.FromQq, context.Message))
             {
-                string CallbackMes = _admincontrol.DoAdmin(context.Message);
+                string CallbackMes = _admincontrol.Admin2do(context.Message);
                 _mahuaApi.SendPrivateMessage(context.FromQq, CallbackMes);
             }
-            //if(AdminList.Contains(context.FromQq))
-            //{
-            //    switch (context.Message)
-            //    {
-            //        case "开始发券":
-            //            _publishquan.StartAsync().GetAwaiter().GetResult();
-            //            _mahuaApi.SendPrivateMessage(context.FromQq, "已开启发券");
-            //            break;
-            //        case "停止发券":
-            //            _publishquan.StartAsync().GetAwaiter().GetResult();
-            //            _mahuaApi.SendPrivateMessage(context.FromQq, "已停止发券");
-            //            break;
-            //        default:
-            //            //非机器人管理指令，正常处理
-            //            GiveQuan(context);
-            //            break;
-            //    }
-            //}
             else
             {
                 GiveQuan(context);
@@ -65,6 +44,10 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             // 不要忘记在MahuaModule中注册
         }
 
+        /// <summary>
+        /// 发券
+        /// </summary>
+        /// <param name="context"></param>
         public static void GiveQuan(PrivateMessageFromFriendReceivedContext context)
         {
             Task.Factory.StartNew(() =>
@@ -90,6 +73,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             });
         }
 
+        #region 公用方法
         /// <summary>
         /// 将网络图片下载，并保存在本地路径，将网络地址替换为本地相对路径
         /// </summary>
@@ -137,5 +121,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
                 return "NoKey";
             }
         }
+
+        #endregion
     }
 }

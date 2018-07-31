@@ -1,5 +1,6 @@
 ﻿using Newbe.Mahua.MahuaEvents;
 using System;
+using Newbe.Mahua.Plugins.Template1.Services;
 
 namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
 {
@@ -10,9 +11,11 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
         : IGroupMemberIncreasedMahuaEvent
     {
         private readonly IMahuaApi _mahuaApi;
+        private readonly IFaQuanStorege _faQuanStorege;
 
         public GroupMemberIncreasedMahuaEvent1(
-            IMahuaApi mahuaApi)
+            IMahuaApi mahuaApi,
+            IFaQuanStorege faQuanStorege)
         {
             _mahuaApi = mahuaApi;
         }
@@ -20,9 +23,12 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
         public void ProcessGroupMemberIncreased(GroupMemberIncreasedContext context)
         {
             // todo 填充处理逻辑
-            throw new NotImplementedException();
-
-            // 不要忘记在MahuaModule中注册
+            _faQuanStorege.InsertInviteInfoAsync(new InviteInfo
+            {
+                QunID = context.FromGroup,
+                Inviter = context.InvitatorOrAdmin,
+                Joiner = context.JoinedQq
+            }).GetAwaiter().GetResult();
         }
     }
 }
