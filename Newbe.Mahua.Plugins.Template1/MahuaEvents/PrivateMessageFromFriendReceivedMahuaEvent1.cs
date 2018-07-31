@@ -18,12 +18,14 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
     {
         private readonly IMahuaApi _mahuaApi;   //我也不知道为什么要加这个 2018年7月28日22点28分
         private readonly IPublishQuan _publishquan;
+        private readonly IAdminControl _admincontrol;
         private List<String> AdminList;
 
-        public PrivateMessageFromFriendReceivedMahuaEvent1(IMahuaApi mahuaApi, IPublishQuan publishQuan)
+        public PrivateMessageFromFriendReceivedMahuaEvent1(IMahuaApi mahuaApi, IPublishQuan publishQuan, IAdminControl adminControl)
         {
             _mahuaApi = mahuaApi;
-            _publishquan = publishQuan;
+            //_publishquan = publishQuan;
+            _admincontrol = adminControl;
             AdminList.Add("609936294");
             AdminList.Add("2432880190");
             AdminList.Add("2653254193");
@@ -32,24 +34,29 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
         public void ProcessFriendMessage(PrivateMessageFromFriendReceivedContext context)
         {
             //判断发送的QQ是否来自管理员
-            if(AdminList.Contains(context.FromQq))
+            if(_admincontrol.IsAdmin(context.FromQq, context.Message))
             {
-                switch (context.Message)
-                {
-                    case "开始发券":
-                        _publishquan.StartAsync().GetAwaiter().GetResult();
-                        _mahuaApi.SendPrivateMessage(context.FromQq, "已开启发券");
-                        break;
-                    case "停止发券":
-                        _publishquan.StartAsync().GetAwaiter().GetResult();
-                        _mahuaApi.SendPrivateMessage(context.FromQq, "已停止发券");
-                        break;
-                    default:
-                        //非机器人管理指令，正常处理
-                        GiveQuan(context);
-                        break;
-                }
+                string CallbackMes = _admincontrol.DoAdmin(context.Message);
+                _mahuaApi.SendPrivateMessage(context.FromQq, CallbackMes);
             }
+            //if(AdminList.Contains(context.FromQq))
+            //{
+            //    switch (context.Message)
+            //    {
+            //        case "开始发券":
+            //            _publishquan.StartAsync().GetAwaiter().GetResult();
+            //            _mahuaApi.SendPrivateMessage(context.FromQq, "已开启发券");
+            //            break;
+            //        case "停止发券":
+            //            _publishquan.StartAsync().GetAwaiter().GetResult();
+            //            _mahuaApi.SendPrivateMessage(context.FromQq, "已停止发券");
+            //            break;
+            //        default:
+            //            //非机器人管理指令，正常处理
+            //            GiveQuan(context);
+            //            break;
+            //    }
+            //}
             else
             {
                 GiveQuan(context);

@@ -116,6 +116,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Services\IAdminControl.cs" />
+    <Compile Include="Services\Impl\AdminControl.cs" />
     <Compile Include="Services\Impl\OwinWebHost.cs" />
     <Compile Include="Services\Impl\PublishQuan.cs" />
     <Compile Include="Services\IPublishQuan.cs" />
