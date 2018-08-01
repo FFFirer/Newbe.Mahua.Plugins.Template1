@@ -30,7 +30,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         {
             //添加定时任务
             //每隔一段时间触发
-            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.MinuteInterval(5));
+            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.MinuteInterval(15));
 
             //使用浏览器打开定时任务的网址
             Process.Start("http://localHost:65238/hangfire/recurring");
@@ -81,7 +81,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                                 res = service.PostQuans(key, PageNo).ToList();
                             }
                             //判断页数的增减
-                            if (Hour.Equals("24"))
+                            if (DateTime.Now.Hour.Equals(0) && DateTime.Now.Minute.Equals(0)&&DateTime.Now.Second.Equals(0))
                             {
                                 PageNo = 1;
                             }

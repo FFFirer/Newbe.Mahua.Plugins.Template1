@@ -146,9 +146,16 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         {
             using(var conn = await _dbHelper.CreateDbConnectionAsync())
             {
-                var res = await conn.QueryAsync("select PAGENO from JISHU where ID='PageNo'");
-                int r = res.FirstOrDefault();
-                return r;
+                var res = await conn.ExecuteReaderAsync("select PAGENO from JISHU where ID='PageNo'");
+                try
+                {
+                    int r = int.Parse(res["PAGENO"].ToString());
+                    return r;
+                }
+                catch
+                {
+                    return 1;
+                }
             }
         }
         //更新今天的页数
