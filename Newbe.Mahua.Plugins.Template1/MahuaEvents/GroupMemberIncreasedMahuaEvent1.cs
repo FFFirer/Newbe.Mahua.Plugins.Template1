@@ -18,6 +18,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             IFaQuanStorege faQuanStorege)
         {
             _mahuaApi = mahuaApi;
+            _faQuanStorege = faQuanStorege;
         }
 
         public void ProcessGroupMemberIncreased(GroupMemberIncreasedContext context)

@@ -17,14 +17,11 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
         : IPrivateMessageFromFriendReceivedMahuaEvent
     {
         private readonly IMahuaApi _mahuaApi;   //我也不知道为什么要加这个 2018年7月28日22点28分
-        private readonly IPublishQuan _publishquan;
         private readonly IAdminControl _admincontrol;
-        private List<String> AdminList;
 
         public PrivateMessageFromFriendReceivedMahuaEvent1(IMahuaApi mahuaApi, IPublishQuan publishQuan, IAdminControl adminControl)
         {
             _mahuaApi = mahuaApi;
-            //_publishquan = publishQuan;
             _admincontrol = adminControl;
         }
 

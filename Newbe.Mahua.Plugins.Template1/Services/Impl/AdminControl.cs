@@ -31,7 +31,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         string FaAllQuan = @"/群([0-9]*?)发全品类券";
         string StartFaQuan = @"/开始发券";
         string StopFaQuan = @"/停止发券";
-        string SomeoneInviteWho = @"/查看([0-9]*?)邀请信息";
+        string SomeoneInviteWho = @"/查看群([0-9]*?)邀请信息";
 
         private static List<string> CommandList = new List<string>
         {
@@ -67,12 +67,37 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         public string Admin2do(string Message)
         {
             //获取命令参数，执行的方法，然后分别调用不同的方法
-            //发特定种类券
-            if(Regex.IsMatch(Message, FaSomeQuan))
+            //发的什么券
+            if (Regex.IsMatch(Message, FaWhatQuan))
+            {
+                Match match = Regex.Match(Message, FaWhatQuan);
+                string QqQun = match.Groups[1].Value;
+                List<FaQuanInfo> infos = _faQuanStorege.GetFaQuanInfoAsync(QqQun).GetAwaiter().GetResult();
+                string message = string.Empty;
+                if (infos.Count > 0)
+                {
+                    message += string.Format("群{0}发券种类：\n", QqQun);
+                    foreach (var i in infos)
+                    {
+                        message += string.Format("{0}  ", i.Info);
+                    }
+                }
+                else
+                {
+                    message = "没有该群信息";
+                }
+                return message;
+            }
+            else if (Regex.IsMatch(Message, FaSomeQuan))        //发特定种类的券
             {
                 Match match = Regex.Match(Message, FaSomeQuan);
                 string QqQun = match.Groups[1].Value;
                 string Q = match.Groups[2].Value;
+                _faQuanStorege.RemoveFaQuanInfoAsync(new FaQuanInfo
+                {
+                    QunID = QqQun,
+                    Info = "全品类"
+                });
                 _faQuanStorege.InsertFaQuanInfoAsync(new FaQuanInfo
                 {
                     QunID = QqQun,
@@ -80,8 +105,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                 }).GetAwaiter().GetResult();
                 return "操作成功";
             }
-            //不发特定种类券
-            if(Regex.IsMatch(Message, NotFaSomeQuan))
+            else if(Regex.IsMatch(Message, NotFaSomeQuan))      //不发特定种类的券
             {
                 Match match = Regex.Match(Message, NotFaSomeQuan);
                 string QqQun = match.Groups[1].Value;
@@ -93,59 +117,53 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                 }).GetAwaiter().GetResult();
                 return "操作成功";
             }
-            //发了什么券
-            if(Regex.IsMatch(Message, FaWhatQuan))
+            else if(Regex.IsMatch(Message, FaAllQuan))          //发全品类的券
             {
                 Match match = Regex.Match(Message, FaWhatQuan);
                 string QqQun = match.Groups[1].Value;
-                List<FaQuanInfo> infos = _faQuanStorege.GetFaQuanInfoAsync(QqQun).GetAwaiter().GetResult();
-                string message = string.Empty;
-                message += string.Format("群{0}发券种类：\n", QqQun);
-                foreach(var i in infos)
-                {
-                    message += string.Format("{0}  ", i.Info);
-                }
-                return message;
-            }
-            //发全品类券
-            if(Regex.IsMatch(Message, FaAllQuan))
-            {
-                Match match = Regex.Match(Message, FaWhatQuan);
-                string QqQun = match.Groups[1].Value;
+                _faQuanStorege.RemoveFaQuanInfoOnQunAsync(QqQun);
                 _faQuanStorege.InsertFaQuanInfoAsync(new FaQuanInfo
                 {
                     QunID = QqQun,
-                    Info = "all"
+                    Info = "全品类"
                 }).GetAwaiter().GetResult();
 
                 return "操作成功";
             }
-            //开始发券
-            if(Regex.IsMatch(Message, StartFaQuan))
+            else if(Regex.IsMatch(Message, StartFaQuan))
             {
                 _publishQuan.StartAsync().GetAwaiter().GetResult();
                 return "START";
             }
-            //停止发券
-            if(Regex.IsMatch(Message, StopFaQuan))
+            else if(Regex.IsMatch(Message, StopFaQuan))
             {
                 _publishQuan.StopAsync().GetAwaiter().GetResult();
                 return "STOP";
             }
-            //谁邀请了谁
-            if(Regex.IsMatch(Message, SomeoneInviteWho))
+            else if(Regex.IsMatch(Message, SomeoneInviteWho))
             {
+                string returnMessage = string.Empty;
                 Match match = Regex.Match(Message, FaWhatQuan);
                 string QqQun = match.Groups[1].Value;
                 List<InviteInfo> invites = _faQuanStorege.GetInviteInfo(QqQun).GetAwaiter().GetResult();
-                List<string> QQs = invites.Select(p => p.Inviter).Distinct().ToList();
-                string returnMessage = string.Empty;
-                foreach (string qq in QQs)
+                if (invites.Count > 0)
                 {
-                    int Count = invites.Where(p => p.Inviter.Equals(qq)).Count();
-                    returnMessage += string.Format("{0}【{1}】", qq, Count);
+                    List<string> QQs = invites.Select(p => p.Inviter).Distinct().ToList();
+                    foreach (string qq in QQs)
+                    {
+                        int Count = invites.Where(p => p.Inviter.Equals(qq)).Count();
+                        returnMessage += string.Format("{0}【{1}】", qq, Count);
+                    }
+                }
+                else
+                {
+                    returnMessage = "没有该群信息";
                 }
                 return returnMessage;
+            }
+            else
+            {
+                return "ERROR:void";
             }
         }
     }

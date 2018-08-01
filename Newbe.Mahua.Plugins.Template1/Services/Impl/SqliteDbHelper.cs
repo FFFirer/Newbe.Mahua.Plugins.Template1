@@ -44,7 +44,8 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
 
         private static void CreateBdIfnotExists()
         {
-            var dbDirectory = (string)AppDomain.CurrentDomain.GetData("DataDirectory");
+            //var dbDirectory = (string)AppDomain.CurrentDomain.GetData("DataDirectory");
+            var dbDirectory = Path.Combine((string)Environment.CurrentDirectory, "\\App_Data");
             if (!Directory.Exists(dbDirectory)){
                 Directory.CreateDirectory(dbDirectory);
             }
@@ -63,6 +64,10 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                         QUNID TEXT NOT NULL,
                         INVITER TEXT,
                         JOINER TEXT)");
+                    conn.Execute(@"CREATE TABLE JISHU(
+                        ID TEXT PRIMARY KEY,
+                        PAGENO INT NOT NULL)");
+                    conn.Execute(@"INSERT INTO JISHU (ID, PAGENO) VALUES('PageNo',1)");
                 }
             }
         }

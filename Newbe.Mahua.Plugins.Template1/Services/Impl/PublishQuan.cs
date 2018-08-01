@@ -30,7 +30,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         {
             //添加定时任务
             //每隔一段时间触发
-            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.Hourly());
+            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.MinuteInterval(5));
 
             //使用浏览器打开定时任务的网址
             Process.Start("http://localHost:65238/hangfire/recurring");
@@ -53,12 +53,13 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         }
         public void Tasks2Do()
         {
-            RobotRemoteService.RobotRemoteService service = new RobotRemoteService.RobotRemoteService();
             //获取当前的时间
             string Hour = DateTime.Now.Hour.ToString();
             //检查是否要开始发券
-            if (TimeList.Contains(Hour))
+            if (!TimeList.Contains(Hour))
             {
+                int PageNo = _faquanstorege.GetNowPagesize().GetAwaiter().GetResult();
+                RobotRemoteService.RobotRemoteService service = new RobotRemoteService.RobotRemoteService();
                 //获取每个群的券关键词
                 List<FaQuanInfo> all_info = _faquanstorege.GetAllFaQuanInfoAsync().GetAwaiter().GetResult();
                 List<string> quns = all_info.Select(x => x.QunID).Distinct().ToList();
@@ -70,14 +71,37 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                         List<string> keys = all_info.Where(p => p.QunID.Equals(id)).Select(x => x.Info).ToList();
                         foreach (string key in keys)
                         {
-                            List<string> res = service.PostQuans(key, 1).ToList();
+                            List<string> res = new List<string>();
+                            if (key.Equals("全品类"))
+                            {
+                                res = service.PostQuans("", PageNo).ToList();
+                            }
+                            else
+                            {
+                                res = service.PostQuans(key, PageNo).ToList();
+                            }
+                            //判断页数的增减
+                            if (Hour.Equals("24"))
+                            {
+                                PageNo = 1;
+                            }
+                            else
+                            {
+                                PageNo++;
+                            }
+                            _faquanstorege.UpdateNowPageSize(new FaQuanJiShu { Id = "PageNo", PageNo = PageNo}).GetAwaiter().GetResult();
                             result.AddRange(res);
                         }
                         List<string> r = result.OrderBy(p => p.Length).Take(15).ToList();
-                        foreach (var l in r)
+                        //异步发送券信息
+                        using(var robotSession = MahuaRobotManager.Instance.CreateSession())
                         {
-                            string o = TransferImage(l);
-                            _mahuaApi.SendGroupMessage(id, o);
+                            var api = robotSession.MahuaApi;
+                            foreach (var l in r)
+                            {
+                                string o = TransferImage(l);
+                                api.SendGroupMessage(id, o);
+                            }
                         }
                     });
                 }

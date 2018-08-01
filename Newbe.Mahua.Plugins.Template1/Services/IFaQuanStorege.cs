@@ -11,7 +11,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services
         //获取发券详情
         Task<List<FaQuanInfo>> GetAllFaQuanInfoAsync();
 
-        //获取发券详情
+        //获取发券详情（特定群）
         Task<List<FaQuanInfo>> GetFaQuanInfoAsync(string qun);
 
         //插入发券详情
@@ -19,12 +19,19 @@ namespace Newbe.Mahua.Plugins.Template1.Services
 
         //删除发券详情
         Task RemoveFaQuanInfoAsync(FaQuanInfo info);
+        //删除一个群的发券信息
+        Task RemoveFaQuanInfoOnQunAsync(string qunId);
 
         //插入邀请进群信息
         Task InsertInviteInfoAsync(InviteInfo Info);
 
         //查询邀请进群信息
         Task<List<InviteInfo>> GetInviteInfo(string qun);
+
+        //查询今天第几页了
+        Task<int> GetNowPagesize();
+        //更新今天的页数
+        Task UpdateNowPageSize(FaQuanJiShu js);
     }
 
     
@@ -44,5 +51,11 @@ namespace Newbe.Mahua.Plugins.Template1.Services
         public string Inviter { get; set; }
         //进群者qq
         public string Joiner { get; set; }
+    }
+
+    public class FaQuanJiShu
+    {
+        public string Id { get; set; }
+        public int PageNo { get; set; }
     }
 }

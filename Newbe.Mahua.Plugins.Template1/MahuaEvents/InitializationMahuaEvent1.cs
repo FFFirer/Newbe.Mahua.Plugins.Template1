@@ -29,7 +29,7 @@ namespace Newbe.Mahua.Plugins.Template1.MahuaEvents
             // 在本地地址上启动Web服务，可以根据需求改变端口
             _webhost.StartAsync("http://localhost:65238", _mahuaApi.GetSourceContainer());
             //初始化数据库
-            _dbHelper.InitDbAsync()
+            _dbHelper.InitDbAsync();
             // 不要忘记在MahuaModule中注册
         }
     }
