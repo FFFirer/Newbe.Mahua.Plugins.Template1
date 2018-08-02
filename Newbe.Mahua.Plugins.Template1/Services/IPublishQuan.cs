@@ -19,5 +19,11 @@ namespace Newbe.Mahua.Plugins.Template1.Services
         /// </summary>
         /// <returns></returns>
         Task StopAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task FaOnceNow();
     }
 }

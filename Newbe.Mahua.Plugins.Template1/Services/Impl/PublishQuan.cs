@@ -9,6 +9,7 @@ using CronExpressionDescriptor;
 using Newbe.Mahua.Plugins.Template1.RobotRemoteService;
 using System.Text.RegularExpressions;
 using System.Net;
+using Newbe.Mahua.Plugins.Template1.Properties;
 
 namespace Newbe.Mahua.Plugins.Template1.Services.Impl
 {
@@ -30,7 +31,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         {
             //添加定时任务
             //每隔一段时间触发
-            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.MinuteInterval(15));
+            RecurringJob.AddOrUpdate(JobId, () => Tasks2Do(), () => Cron.Hourly());
 
             //使用浏览器打开定时任务的网址
             Process.Start("http://localHost:65238/hangfire/recurring");
@@ -51,64 +52,27 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
             _mahuaApi.SendGroupMessage("826427383", NowStamp + "\n" + message);
 
         }
+
+        /// <summary>
+        /// 定时任务
+        /// </summary>
         public void Tasks2Do()
         {
             //获取当前的时间
             string Hour = DateTime.Now.Hour.ToString();
             //检查是否要开始发券
-            if (!TimeList.Contains(Hour))
+            if (TimeList.Contains(Hour))
             {
-                int PageNo = _faquanstorege.GetNowPagesize().GetAwaiter().GetResult();
-                RobotRemoteService.RobotRemoteService service = new RobotRemoteService.RobotRemoteService();
-                //获取每个群的券关键词
-                List<FaQuanInfo> all_info = _faquanstorege.GetAllFaQuanInfoAsync().GetAwaiter().GetResult();
-                List<string> quns = all_info.Select(x => x.QunID).Distinct().ToList();
-                foreach(string id in quns)
-                {
-                    Task.Factory.StartNew(() =>
-                    {
-                        List<string> result = new List<string>();
-                        List<string> keys = all_info.Where(p => p.QunID.Equals(id)).Select(x => x.Info).ToList();
-                        foreach (string key in keys)
-                        {
-                            List<string> res = new List<string>();
-                            if (key.Equals("全品类"))
-                            {
-                                res = service.PostQuans("", PageNo).ToList();
-                            }
-                            else
-                            {
-                                res = service.PostQuans(key, PageNo).ToList();
-                            }
-                            //判断页数的增减
-                            if (DateTime.Now.Hour.Equals(0) && DateTime.Now.Minute.Equals(0)&&DateTime.Now.Second.Equals(0))
-                            {
-                                PageNo = 1;
-                            }
-                            else
-                            {
-                                PageNo++;
-                            }
-                            _faquanstorege.UpdateNowPageSize(new FaQuanJiShu { Id = "PageNo", PageNo = PageNo}).GetAwaiter().GetResult();
-                            result.AddRange(res);
-                        }
-                        List<string> r = result.OrderBy(p => p.Length).Take(15).ToList();
-                        //异步发送券信息
-                        using(var robotSession = MahuaRobotManager.Instance.CreateSession())
-                        {
-                            var api = robotSession.MahuaApi;
-                            foreach (var l in r)
-                            {
-                                string o = TransferImage(l);
-                                api.SendGroupMessage(id, o);
-                            }
-                        }
-                    });
-                }
+                Start2Do();
             }
-
         }
 
+
+        public Task FaOnceNow()
+        {
+            Start2Do();
+            return Task.FromResult(0);
+        }
         /// <summary>
         /// 将网络图片下载，并保存在本地路径，将网络地址替换为本地相对路径
         /// </summary>
@@ -136,6 +100,90 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
             using (WebClient client = new WebClient())
             {
                 client.DownloadFile(download_url, image_name);
+            }
+        }
+
+        /// <summary>
+        /// 写配置文件
+        /// </summary>
+        /// <param name="n"></param>
+        private void SetPageNo(int n)
+        {
+            Properties.Settings.Default.PageNo = n.ToString();
+        }
+
+        //获取几天发到第几页了
+        private int GetPageNo()
+        {
+            int res = int.Parse(Properties.Settings.Default.PageNo);
+            if (IsToday())
+            {
+                SetPageNo(res+1);
+                return res;
+            }
+            else
+            {
+                SetPageNo(1);
+                return 1;
+            }
+        }
+
+        //判断是否是今天的
+        private bool IsToday()
+        {
+            string today = DateTime.Now.Day.ToString();
+            string yesterday = Properties.Settings.Default.Today.ToString();
+            if (yesterday != today)
+            {
+                Properties.Settings.Default.Today = today;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        } 
+
+
+        public void Start2Do()
+        {
+            int PageNo = GetPageNo();
+            RobotRemoteService.RobotRemoteService service = new RobotRemoteService.RobotRemoteService();
+            //获取每个群的券关键词
+            List<FaQuanInfo> all_info = _faquanstorege.GetAllFaQuanInfoAsync().GetAwaiter().GetResult();
+            List<string> quns = all_info.Select(x => x.QunID).Distinct().ToList();
+            foreach (string id in quns)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    List<string> result = new List<string>();
+                    List<string> keys = all_info.Where(p => p.QunID.Equals(id)).Select(x => x.Info).ToList();
+                    foreach (string key in keys)
+                    {
+                        List<string> res = new List<string>();
+                        if (key.Equals("全品类"))
+                        {
+                            res = service.PostQuans("", PageNo).ToList();
+                        }
+                        else
+                        {
+                            res = service.PostQuans(key, PageNo).ToList();
+                        }
+                        _faquanstorege.UpdateNowPageSize(new FaQuanJiShu { Id = "PageNo", PageNo = PageNo }).GetAwaiter().GetResult();
+                        result.AddRange(res);
+                    }
+                    List<string> r = result.OrderBy(p => p.Length).Take(15).ToList();
+                    //异步发送券信息
+                    using (var robotSession = MahuaRobotManager.Instance.CreateSession())
+                    {
+                        var api = robotSession.MahuaApi;
+                        foreach (var l in r)
+                        {
+                            string o = TransferImage(l);
+                            api.SendGroupMessage(id, o);
+                        }
+                    }
+                });
             }
         }
     }

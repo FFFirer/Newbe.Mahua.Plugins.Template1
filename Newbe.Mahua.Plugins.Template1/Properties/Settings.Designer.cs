@@ -32,5 +32,29 @@ namespace Newbe.Mahua.Plugins.Template1.Properties {
                 return ((string)(this["Newbe_Mahua_Plugins_Template1_RobotRemoteService_RobotRemoteService"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public string PageNo {
+            get {
+                return ((string)(this["PageNo"]));
+            }
+            set {
+                this["PageNo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Today {
+            get {
+                return ((string)(this["Today"]));
+            }
+            set {
+                this["Today"] = value;
+            }
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
         string FaAllQuan = @"/群([0-9]*?)发全品类券";
         string StartFaQuan = @"/开始发券";
         string StopFaQuan = @"/停止发券";
+        string FaQuanAtOnce = @"/现在发券";
         string SomeoneInviteWho = @"/查看群([0-9]*?)邀请信息";
 
         private static List<string> CommandList = new List<string>
@@ -41,6 +42,7 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
             @"/群([0-9]*?)发全品类券",
             @"/开始发券",
             @"/停止发券",
+            @"/现在发券",
             @"/查看群([0-9]*?)邀请信息",
         };
 
@@ -160,6 +162,11 @@ namespace Newbe.Mahua.Plugins.Template1.Services.Impl
                     returnMessage = "没有该群信息";
                 }
                 return returnMessage;
+            }
+            else if (Regex.IsMatch(Message, FaQuanAtOnce))
+            {
+                _publishQuan.FaOnceNow();
+                return "开始发送";
             }
             else
             {
